@@ -1,0 +1,35 @@
+---
+- hosts: prometheus
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Pull Prometheus Docker image
+      community.docker.docker_image:
+        name: prom/prometheus:latest
+        source: pull
+
+    - name: Create Prometheus container
+      community.docker.docker_container:
+        name: prometheus
+        image: prom/prometheus:latest
+        state: started
+        ports:
+          - "9090:9090"
+        volumes:
+          - /path/to/your/prometheus.yml:/etc/prometheus/prometheus.yml

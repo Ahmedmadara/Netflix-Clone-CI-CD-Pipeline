@@ -1,0 +1,73 @@
+on jenkins vm 
+
+
+sudo vi  kube.sh
+
+
+sudo apt update
+sudo apt install curl
+curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+kubectl version --client
+
+
+sudo chmod +x kube.sh 
+sh kube.sh 
+===============================================================================
+create 2 vm 1 worker node and 1 master node 
+
+sudo apt-get update
+sudo apt-get install -y docker.io
+sudo usermod –aG docker Ubuntu
+newgrp docker
+sudo chmod 777 /var/run/docker.sock
+
+sudo apt-get update
+
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+
+sudo mkdir -p /etc/apt/keyrings
+
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+
+sudo apt-get update
+
+sudo apt-get install -y kubelet kubeadm kubectl
+
+sudo apt-mark hold kubelet kubeadm kubectl
+
+
+============================================================
+============================================================
+
+# Master Node
+
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+# in case your in root exit from it and run below commands
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+========================================================
+==========================================================
+after this command u will take a token 
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+
+save it and sudo + copy it into worker node to connect worker with master 
+
+sudo kubeadm join 10.0.2.15:6443 --token ei9fh4.7n783v5aon1mgixe \
+        --discovery-token-ca-cert-hash sha256:0805ddb3420de1f4c853b93f7a17841827ccffb4b102bea87990b15f77f16800
+====================================================================
+======================================================================
+ 
+
+
+
+
+
+
+

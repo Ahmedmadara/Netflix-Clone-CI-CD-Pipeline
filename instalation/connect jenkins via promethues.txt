@@ -1,0 +1,30 @@
+after installing promethues plugin
+
+
+
+sudo vim /etc/prometheus/prometheus.yml
+
+
+# paste 
+
+- job_name: 'jenkins'
+    metrics_path: '/prometheus'
+    static_configs:
+      - targets: ['<jenkins-ip>:8080']
+
+promtool check config /etc/prometheus/prometheus.yml
+curl -X POST http://localhost:9090/-/reload
+
+
+http://<ip>:9090/targets
+
+
+
+srpz uevl ghpk wyrn
+
+
+manage jenkins >> plugins >> add (email + promethues )
+manage jenkins >> system >> promethues 
+manage jenkins >> credentials >> add email for jenkins with username and password 
+password from app password gmail
+========================================================================

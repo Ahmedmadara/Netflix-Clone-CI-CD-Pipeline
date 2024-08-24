@@ -1,0 +1,48 @@
+---
+- hosts: jenkins-sonar
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Pull Jenkins Docker image
+      docker_image:
+        name: jenkins/jenkins
+        source: pull
+
+    - name: Pull SonarQube Docker image
+      docker_image:
+        name: sonarqube
+        source: pull
+
+    - name: Create Jenkins container
+      docker_container:
+        name: jenkins
+        image: jenkins/jenkins
+        state: started
+        ports:
+          - "8080:8080"
+        volumes:
+          - /var/jenkins_home:/var/jenkins_home
+
+    - name: Create SonarQube container
+      docker_container:
+        name: sonarqube
+        image: sonarqube
+        state: started
+        ports:
+          - "9000:9000"

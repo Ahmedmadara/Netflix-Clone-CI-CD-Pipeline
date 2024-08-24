@@ -1,0 +1,38 @@
+To visualize metrics we can use Grafana. There are many different data sources that Grafana supports, one of them is Prometheus.
+
+First, let’s make sure that all the dependencies are installed.
+
+
+sudo apt-get install -y apt-transport-https software-properties-common
+
+
+# Next, add the GPG key.
+
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+
+# Add this repository for stable releases.
+echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+
+
+# After you add the repository, update and install Garafana.
+
+
+
+sudo apt-get update
+
+sudo apt-get -y install grafana
+
+sudo systemctl enable grafana-server
+sudo systemctl start grafana-server
+sudo systemctl status grafana-server
+========================================
+Go to http://<ip>:3000
+
+
+username admin
+password admin
+
+
+
+Data source >> promethues >> add url of promethues >> save and test 
+dashboard >> import dashboard >> 1860 or 9964

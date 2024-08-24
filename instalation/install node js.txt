@@ -1,0 +1,122 @@
+# First, let’s create a system user for Node Exporter by running the following command:
+
+
+sudo useradd \
+    --system \
+    --no-create-home \
+    --shell /bin/false node_exporter
+
+# Use the wget command to download the binary.
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+
+
+
+# Extract the node exporter from the archive.
+
+tar -xvf node_exporter-1.6.1.linux-amd64.tar.gz
+
+# Move binary to the /usr/local/bin.
+
+
+sudo mv \
+  node_exporter-1.6.1.linux-amd64/node_exporter \
+  /usr/local/bin/
+
+
+# Clean up, and delete node_exporter archive and a folder.
+
+rm -rf node_exporter*
+
+# Verify that you can run the binary.
+
+node_exporter --version
+
+========================================
+========================================
+
+Next, create a similar systemd unit file.
+
+
+
+
+
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=500
+StartLimitBurst=5
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/local/bin/node_exporter \
+    --collector.logind
+[Install]
+WantedBy=multi-user.target
+=========================================
+=========================================
+
+# To automatically start the Node Exporter after reboot, enable the service.
+
+
+sudo systemctl enable node_exporter
+
+
+# Then start the Node Exporter.
+
+sudo systemctl start node_exporter
+
+# Check the status of Node Exporter with the following command:
+
+sudo systemctl status node_exporter
+
+
+
+
+# To create a static target, you need to add job_name with static_configs.
+sudo vim /etc/prometheus/prometheus.yml
+
+- job_name: node_export
+    static_configs:
+      - targets: ["localhost:9100"]
+===================================================
+===================================================
+
+# Before, restarting check if the config is valid.
+
+promtool check config /etc/prometheus/prometheus.yml
+
+
+#Then, you can use a POST request to reload the config.
+
+curl -X POST http://localhost:9090/-/reload
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
